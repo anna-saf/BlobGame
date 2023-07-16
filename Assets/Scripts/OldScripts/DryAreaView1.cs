@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class DryAreaView1 : MonoBehaviour
+/*public class DryAreaView1 : MonoBehaviour
 {
     private bool isMustSlide = false;
     private CharacterController _playerColl;
@@ -40,7 +38,4 @@ public class DryAreaView1 : MonoBehaviour
         _playerColl.Move(new Vector3(speed * Time.deltaTime * chMoveDir, 0, 0));
        // print("sliding");
     }
-
-
-
-}
+}*/

@@ -513,8 +513,6 @@ MonoBehaviour:
   vaporizationVolumeSpeed: 1
   startBlobVolume: 50
   startBlobSize: 1
-  speedIncreaseFactor: 0.1
-  maxJumpHeight: 2
   startJumpHeight: 6
   startBlobSpeed: 2
   maxBlobSpeed: 8
@@ -525,6 +523,7 @@ MonoBehaviour:
   minVolumeForBlobSize: 25
   blobVolumeFilled: 25
   slideSpeed: 1
+  slopeLimit: 30
   livesCount: 3
 --- !u!4 &240616346
 Transform:

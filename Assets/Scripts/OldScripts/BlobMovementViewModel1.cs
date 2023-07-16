@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 
-public class BlobMovementViewModel1 
+/*public class BlobMovementViewModel1 
 {
     public ReactiveProperty<Vector3> blobMovement;
     public ReactiveProperty<bool> isWall;
@@ -201,4 +201,4 @@ public class BlobMovementViewModel1
             
         //}
     }
-}
+}*/

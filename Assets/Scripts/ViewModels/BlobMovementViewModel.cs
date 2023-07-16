@@ -42,7 +42,9 @@ public class BlobMovementViewModel
     private bool isAbove = false;
 
     private bool isWaterWall = false;
+    private bool isWaterWallCollision = false;
     private int waterWallMovementDirection;
+    private float lastJumpHeight;
 
 
     public BlobMovementViewModel(ReactiveProperty<float> blobTemp, ReactiveProperty<float> blobSize,CharacterController characterController)
@@ -50,6 +52,7 @@ public class BlobMovementViewModel
         isTouchingWall = false;
 
         this.characterController = characterController;
+        characterController.slopeLimit = GlobalModel.Instance.SlopeLimit;
 
         startJumpHeight = GlobalModel.Instance.StartJumpHeight;
         jumpHeight = startJumpHeight;
@@ -96,9 +99,25 @@ public class BlobMovementViewModel
             jumpSpeed += Mathf.Sqrt(jumpHeight * (-1) * gravity);
             isJump = false;
         }
+
+        if (isGrounded && isWaterWall && waterWallMovementDirection * Math.Abs(horizontal) != horizontal * Math.Abs(waterWallMovementDirection))
+        {
+            isWaterWall = false;
+        }
+
+        if (lastJumpHeight > characterController.transform.position.y && 
+            isWaterWallCollision && 
+            waterWallMovementDirection * Math.Abs(horizontal) == horizontal * Math.Abs(waterWallMovementDirection) &&
+            horizontal != 0)
+        {
+            WaterWallTouchAction();
+            
+        }
+
         if (!isWaterWall)
         {
             jumpSpeed += gravity * Time.deltaTime;
+            lastJumpHeight = characterController.transform.position.y;
         }
         else
         {
@@ -195,14 +214,13 @@ public class BlobMovementViewModel
     public void WaterWallTouchAction()
     {
         isWaterWall = true;
+        isWaterWallCollision = true;
         waterWallMovementDirection = horizontal > 0?1:-1;
-        //characterController.slopeLimit = 90;
-
     }
 
     public void WaterWallEndTouchAction()
     {
         isWaterWall = false;
-        //characterController.slopeLimit = 30;
+        isWaterWallCollision = false;
     }
 }

@@ -1,73 +1,91 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
+using NaughtyAttributes;//Библиотека для управления параметрами скрипта в инспекторе https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996
 using UnityEngine;
 
 public class GlobalModel : MonoBehaviour
 {
-    //Общий параметр времени, за которое изменяется значение на нужную велечину
+    
+    [Header("Общий параметр времени, за которое изменяется значение на нужную велечину")]
     [SerializeField] private float modificationTime;
 
     [Header("----------------------")]
 
-    //Стартовая температура капли
+    [Header("Стартовая температура капли")]
     [SerializeField] private float startBlobTemp;
-    //Температура кипения капли
+    
+    [Header("Температура кипения капли")]
     [SerializeField] private float boilingTemp;
-    //Температура замерзания
+    
+    [Header("Температура замерзания")]
     [SerializeField] private float freezingTemp;
 
     [Header("----------------------")]
 
-    //Скорость нагревания капли в секунду
+    
+    [Header("Скорость нагревания капли в секунду")]
     [SerializeField] private float blobHeatingSpeed;
-    //Скорость охлаждения капли в секунду
+    
+    [Header("Скорость охлаждения капли в секунду")]
     [SerializeField] private float blobCoolingSpeed;
 
     [Header("----------------------")]
 
-    //Температура испарения капли
+    
+    [Header("Температура испарения капли")]
     [SerializeField] private float vaporizationTemp;
-    //Скорость испарения капли в секунду
+    
+    [Header("Скорость испарения капли в секунду")]
     [SerializeField] private float vaporizationVolumeSpeed;
 
     [Header("----------------------")]
 
-    //Стартовый объем капли
+    //
+    [Header("Стартовый объем капли")]
     [SerializeField] private float startBlobVolume;
-    //Стартовый размер капли
+    //
+    [Header("Стартовый размер капли")]
     [SerializeField] private float startBlobSize;
 
-    [SerializeField] private float speedIncreaseFactor;
-    [SerializeField] private float maxJumpHeight;
-    //Стартовая высота прыжка
+    [Header("----------------------")]
+
+    [Header("Стартовая высота прыжка")]
     [SerializeField] private float startJumpHeight;
 
-    //Стартовая скорость капли
+    [Header("----------------------")]
+
+    [Header("Стартовая скорость капли")]
     [SerializeField] private float startBlobSpeed;
-    //Максимальная скорость капли
+
+    [Header("Максимальная скорость капли")]
     [SerializeField] private float maxBlobSpeed;
-    //Минимальная скорость капли
+    
+    [Header("Минимальная скорость капли")]
     [SerializeField] private float minBlobSpeed;
 
-    //Максимальный размер капли (1.5)
+    [Header("----------------------")]
+
+    [Header("Максимальный размер капли (1.5)")]
     [SerializeField] private float maxBlobSize;
-    //Минимальный размер капли (0.5)
+    [Header("Минимальный размер капли (0.5)")]   
     [SerializeField] private float minBlobSize;
-    //Значение объема капли при максимальном размере (75)
+
+    [Header("Значение объема капли при максимальном размере (75)")]
     [SerializeField] private float maxVolumeForBlobSize;
-    //Значение объема капли при минимальном размере (25)
+    [Header("Значение объема капли при минимальном размере (25)")]
     [SerializeField] private float minVolumeForBlobSize;
-    //Восполняемый объем капли от воды
+    [Header("Восполняемый объем капли от воды")]
     [SerializeField] private float blobVolumeFilled;
 
     [Header("----------------------")]
-    //Скорость скольжения на сухой наклонной поверхности
+
+    [Header("Скорость скольжения на сухой наклонной поверхности")]
     [SerializeField] private float slideSpeed;
+
+    [Header("Угол наклона поверхности, по которому капля может забираться")]
+    [SerializeField] private float slopeLimit;
 
     [Header("----------------------")]
 
-    //Кол-во жизней на старте
+    [Header("Кол-во жизней на старте")]
     [SerializeField] private int livesCount;
 
     public float ModificationTime { get { return modificationTime; } }
@@ -81,8 +99,6 @@ public class GlobalModel : MonoBehaviour
     public float VaporizationTemp { get { return vaporizationTemp; } }
     public float VaporizationVolumeSpeed { get { return vaporizationVolumeSpeed; } }
 
-    public float SpeedIncreaseFactor { get { return speedIncreaseFactor; } }
-    public float MaxJumpHeight { get { return maxJumpHeight; } }
     public float StartBlobVolume { get { return startBlobVolume; } }
     public float StartBlobSize{ get { return startBlobSize; } }
     public float StartJumpHeight { get { return startJumpHeight; } }
@@ -96,6 +112,8 @@ public class GlobalModel : MonoBehaviour
     public float BlobVolumeFilled { get { return blobVolumeFilled; } }
 
     public float SlideSpeed { get { return slideSpeed; } }
+    public float SlopeLimit { get { return slopeLimit; } }
+
     public int LivesCount { get { return livesCount; } }
 
     public static GlobalModel Instance;
