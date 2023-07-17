@@ -6,14 +6,10 @@ using UnityEngine;
 
 public class BlobTempViewModel
 {
-    public ReactiveProperty<float> blobTemp { get; private set; } = new ReactiveProperty<float>();   
-
-    
+    public ReactiveProperty<float> blobTemp { get; private set; } = new ReactiveProperty<float>();
+    private float blobTempValue;
 
     private bool onHotColdArea = false;
-    private float startBlobTemp;
-    private float minBlobTemp;
-    private float maxBlobTemp;
 
     private CoroutineRunner coroutineRunner;
 
@@ -21,33 +17,30 @@ public class BlobTempViewModel
     private IEnumerator tempDecreaseOnArea;
     private IEnumerator tempDecreaseFromHighTemp;
 
-    private bool isGameEnd = false;
-
     public BlobTempViewModel()
     {
         coroutineRunner = CoroutineRunner.Instance;
         GlobalModel model = GlobalModel.Instance;
-        startBlobTemp = GlobalModel.Instance.StartBlobTemp;
-        minBlobTemp = GlobalModel.Instance.FreezingTemp;
-        maxBlobTemp = GlobalModel.Instance.BoilingTemp;
         blobTemp.Value = GlobalModel.Instance.StartBlobTemp;
+        blobTempValue = blobTemp.Value;
 
-        blobTemp.Subscribe(_ => OnBlobTempChange());
         CheckpointManager.Instance.OnGoToLastCheckpoint += CheckpointManager_OnGoToLastCheckpoint; 
     }
 
-    public void Update()
-    {
-        if (isGameEnd)
-        {
-            isGameEnd = false;
-            GameManager.Instance.TryGameOver();
-        }
-    } 
-
     private void CheckpointManager_OnGoToLastCheckpoint(object sender, System.EventArgs e)
     {
-        blobTemp.Value = CheckpointManager.Instance.BlobTempCheckpoint;
+        blobTempValue = CheckpointManager.Instance.BlobTempCheckpoint;
+        if (tempDecreaseOnArea != null)
+        {
+            coroutineRunner.StopOneCoroutine(tempDecreaseOnArea);
+            tempDecreaseOnArea = null;
+        }
+        if (tempIncreaseOnArea != null)
+        {
+            coroutineRunner.StopOneCoroutine(tempIncreaseOnArea);
+            tempIncreaseOnArea = null;
+        }
+        OnBlobTempChange();
     }
 
     public void HotAreaTouchActions()
@@ -75,8 +68,8 @@ public class BlobTempViewModel
         //Корутина для увеличения температуры
         while (true)
         {
-            //Debug.Log("blobTemp: " + blobTemp.Value.ToString());
-            blobTemp.Value += GlobalModel.Instance.BlobHeatingSpeed;
+            blobTempValue += GlobalModel.Instance.BlobHeatingSpeed;
+            OnBlobTempChange();
             yield return new WaitForSeconds(GlobalModel.Instance.ModificationTime);
         }
     }
@@ -107,7 +100,8 @@ public class BlobTempViewModel
         //Корутина для уменьшения температуры
         while (true)
         {
-            blobTemp.Value -= GlobalModel.Instance.BlobCoolingSpeed;
+            blobTempValue -= GlobalModel.Instance.BlobCoolingSpeed;
+            OnBlobTempChange();
             yield return new WaitForSeconds(GlobalModel.Instance.ModificationTime);
         }
     }
@@ -117,7 +111,8 @@ public class BlobTempViewModel
         //Функция, которая вызывается каждый раз, когда меняется температура
         CheckMinBlobTemp();
         CheckMaxBlobTemp();
-        СoolingDown(blobTemp.Value);
+        СoolingDown(blobTempValue);
+        ChangeBlobVolumeReactiveProperty(blobTempValue);
     }
 
     public void СoolingDown(float temp)
@@ -146,7 +141,7 @@ public class BlobTempViewModel
     private void CheckMinBlobTemp()
     {
         //Проверка, что температура не стала меньше 0. Вызывается везде, где уменьшается температура
-        if (blobTemp.Value <= 0)
+        if (blobTempValue <= GlobalModel.Instance.FreezingTemp)
         {
             onHotColdArea = false;
             //Конец игры
@@ -155,13 +150,13 @@ public class BlobTempViewModel
                 coroutineRunner.StopOneCoroutine(tempDecreaseOnArea);
                 tempDecreaseOnArea = null;
             }
-            isGameEnd = true;
+            GameManager.Instance.TryGameOver();
         }
     }
     private void CheckMaxBlobTemp()
     {
         //Проверка, что температура не стала больше 100. Вызывается везде, где увеличивается температура
-        if (blobTemp.Value >= GlobalModel.Instance.BoilingTemp)
+        if (blobTempValue >= GlobalModel.Instance.BoilingTemp)
         {
             onHotColdArea = false;
             //Конец игры
@@ -170,7 +165,11 @@ public class BlobTempViewModel
                 coroutineRunner.StopOneCoroutine(tempIncreaseOnArea);
                 tempIncreaseOnArea = null;
             }
-            isGameEnd = true;
+            GameManager.Instance.TryGameOver();
         }
+    }
+    private void ChangeBlobVolumeReactiveProperty(float blobTempVal)
+    {
+        blobTemp.Value = blobTempVal;
     }
 }

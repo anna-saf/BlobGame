@@ -34,8 +34,8 @@ public class BlobView : MonoBehaviour
     private void Update()
     {
         BlobMovementViewModel.Update();
-        BlobTempViewModel?.Update();
-        BlobVolumeViewModel?.Update();
+        //BlobTempViewModel?.Update();
+        //BlobVolumeViewModel?.Update();
     }
 
 

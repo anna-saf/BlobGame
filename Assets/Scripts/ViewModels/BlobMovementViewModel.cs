@@ -24,7 +24,7 @@ public class BlobMovementViewModel
 
     private Vector3 dir;
 
-    private float startJumpHeight = 6f;
+    private float startJumpHeight;
     private float moveSpeed;
     private float startSpeed;
     private float maxSpeed;

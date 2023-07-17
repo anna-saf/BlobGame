@@ -510,7 +510,7 @@ MonoBehaviour:
   blobHeatingSpeed: 1
   blobCoolingSpeed: 1
   vaporizationTemp: 50
-  vaporizationVolumeSpeed: 1
+  vaporizationVolumeSpeed: 0.3
   startBlobVolume: 50
   maxBlobVolume: 100
   minBlobVolume: 0
