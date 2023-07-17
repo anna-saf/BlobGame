@@ -15,7 +15,7 @@ public class DryAreaViewModel
     {
         if (other.tag == "Player")
         {
-            other.GetComponent<BlobView>().BlobMovementViewModel.DryAreaTouchActions(moveDir);
+            //other.GetComponent<BlobView>().BlobMovementViewModel.DryAreaTouchActions(moveDir);
         }
     }
 
@@ -23,7 +23,7 @@ public class DryAreaViewModel
     {
         if (other.tag == "Player")
         {
-            other.GetComponent<BlobView>().BlobMovementViewModel.DryAreaEndTouchActions();
+            //other.GetComponent<BlobView>().BlobMovementViewModel.DryAreaEndTouchActions();
         }
     }
 }

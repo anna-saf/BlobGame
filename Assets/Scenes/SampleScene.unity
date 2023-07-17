@@ -516,7 +516,7 @@ MonoBehaviour:
   minBlobVolume: 0
   startBlobSize: 1
   startJumpHeight: 6
-  startBlobSpeed: 2
+  startBlobSpeed: 4
   maxBlobSpeed: 8
   minBlobSpeed: 1
   maxBlobSize: 1.5
@@ -525,7 +525,7 @@ MonoBehaviour:
   minVolumeForBlobSize: 25
   blobVolumeFilled: 25
   slideSpeed: 1
-  slopeLimit: 30
+  slopeLimit: 20
   livesCount: 3
 --- !u!4 &240616346
 Transform:
@@ -782,7 +782,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 246355846}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0968b1d354e10d94e927507ca8cb4f5b, type: 3}
   m_Name: 
@@ -3743,7 +3743,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1986596581}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0968b1d354e10d94e927507ca8cb4f5b, type: 3}
   m_Name: 

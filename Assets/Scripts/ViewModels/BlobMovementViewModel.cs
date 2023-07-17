@@ -16,11 +16,12 @@ public class BlobMovementViewModel
     private float jumpHeight;
     private float jumpSpeed;
     private bool isJump = false;
+    private bool isJumpEnd = true;
 
     //Move Variables
     private float horizontal = 0;
 
-    private float gravity = -9.81f;
+    private float gravity = -80f;
 
     private Vector3 dir;
 
@@ -35,8 +36,8 @@ public class BlobMovementViewModel
 
     public bool isTouchingWall;
 
-    private float startSlideSpeed;
     private float slideSpeed = 0;
+    private int slideMovementDirection;
     private bool isSlide = false;
 
     private bool isAbove = false;
@@ -66,8 +67,7 @@ public class BlobMovementViewModel
         minTemp = GlobalModel.Instance.FreezingTemp;
         startTemp = GlobalModel.Instance.StartBlobTemp;
 
-        startSlideSpeed = GlobalModel.Instance.SlideSpeed;
-
+        slideSpeed = GlobalModel.Instance.SlideSpeed;
 
         GameInput.Instance.OnJump += GameInput_OnJump;
         GameInput.Instance.OnMove += GameInput_OnMove;
@@ -81,30 +81,27 @@ public class BlobMovementViewModel
 
     public void Update()
     {
-        if (isGrounded)
-        {
-            jumpSpeed = 0;
-            isAbove = true;
-        }
-
-        if ((characterController.collisionFlags & CollisionFlags.Above) != 0 && isAbove)
-        {
-            jumpSpeed = 0;
-            isJump = false;
-            isAbove = false;
-        }
-
+        CheckGrounded();
+        CheckAbove();
         if (isJump)
         {
             jumpSpeed += Mathf.Sqrt(jumpHeight * (-1) * gravity);
             isJump = false;
         }
+        if (isGrounded && jumpSpeed <= 0)
+        {
+            isJumpEnd = true;
+        }
 
-        if (isGrounded && isWaterWall && waterWallMovementDirection * Math.Abs(horizontal) != horizontal * Math.Abs(waterWallMovementDirection))
+        //ѕроверка на то, что капл€ не спустилась с вод€ной стены на землю
+        if (isGrounded && 
+            isWaterWall && 
+            waterWallMovementDirection * Math.Abs(horizontal) != horizontal * Math.Abs(waterWallMovementDirection))
         {
             isWaterWall = false;
         }
 
+        //ѕроверка на то, что капл€ прыгнула на вод€ной стене и достигла максимальной высоты прыжка
         if (lastJumpHeight > characterController.transform.position.y && 
             isWaterWallCollision && 
             waterWallMovementDirection * Math.Abs(horizontal) == horizontal * Math.Abs(waterWallMovementDirection) &&
@@ -113,6 +110,38 @@ public class BlobMovementViewModel
             WaterWallTouchAction();
             
         }
+
+        //ѕроверка на то, что капл€ сейчас стоит на наклонной поверхности больше, чем максимальна€, и надо скатыватьс€
+        RaycastHit hit;
+
+        if (Physics.Raycast(characterController.transform.position, Vector3.down, out hit))
+        {
+            Debug.DrawRay(characterController.transform.position, Vector3.down, Color.red, 0);
+            float surfaceAngle = Vector3.Angle(hit.normal, Vector3.up);
+            if (surfaceAngle > GlobalModel.Instance.SlopeLimit && !isWaterWall && isJumpEnd)
+            {
+                if (horizontal * hit.transform.rotation.z < 0)
+                {
+                    isSlide = false;
+                    Debug.Log("lf");
+                }
+                else
+                {
+                    if (!isSlide)
+                    {
+                        slideMovementDirection = hit.transform.rotation.z > 0 ? -1 : 1;
+
+                        isSlide = true;
+                    }
+                }
+            }
+            else
+            {
+                isSlide = false;
+            }
+
+        }
+
 
         if (!isWaterWall)
         {
@@ -127,7 +156,7 @@ public class BlobMovementViewModel
         float movement;
         if (isSlide)
         {
-            movement = slideSpeed * Time.deltaTime;
+            movement = slideSpeed * slideMovementDirection * Time.deltaTime;
         }
         else
         {
@@ -143,6 +172,24 @@ public class BlobMovementViewModel
             dir = new Vector3(movement, jumpSpeed * Time.deltaTime, 0);
         }
         characterController.Move(dir);
+    }
+
+    private void CheckGrounded()
+    {
+        if (isGrounded)
+        {
+            jumpSpeed = 0;
+            isAbove = true;
+        }
+    }
+    private void CheckAbove()
+    {
+        if ((characterController.collisionFlags & CollisionFlags.Above) != 0 && isAbove)
+        {
+            jumpSpeed = 0;
+            isJump = false;
+            isAbove = false;
+        }
     }
 
     private void CheckpointManagerOnGoToLastCheckpoint(object sender, EventArgs e)
@@ -180,35 +227,17 @@ public class BlobMovementViewModel
     private void GameInput_OnMove(object sender, GameInput.MovementVectorEventArgs e)
     {
         horizontal = e.movementVector.x;
-        if (horizontal != 0)
-        {
-            isSlide = false;
-        }
-        else
-        {
-            isSlide = true;
-        }
-
         characterController.transform.rotation = Quaternion.LookRotation(new Vector2(horizontal*(-1), 0));
     }
 
     private void GameInput_OnJump(object sender, System.EventArgs e)
     {
-        if (slideSpeed == 0 && isGrounded || isWaterWall)
+        if (isGrounded || isWaterWall)
         {
             isJump = true;
+            isJumpEnd = false;
             isWaterWall = false;
         }
-    }
-
-    public void DryAreaTouchActions(int moveDir)
-    {
-        slideSpeed = startSlideSpeed * moveDir;
-    }
-
-    public void DryAreaEndTouchActions()
-    {
-        slideSpeed = 0;
     }
 
     public void WaterWallTouchAction()
