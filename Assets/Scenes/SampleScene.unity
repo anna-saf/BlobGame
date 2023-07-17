@@ -512,6 +512,8 @@ MonoBehaviour:
   vaporizationTemp: 50
   vaporizationVolumeSpeed: 1
   startBlobVolume: 50
+  maxBlobVolume: 100
+  minBlobVolume: 0
   startBlobSize: 1
   startJumpHeight: 6
   startBlobSpeed: 2

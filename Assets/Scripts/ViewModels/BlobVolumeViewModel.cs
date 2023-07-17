@@ -72,7 +72,7 @@ public class BlobVolumeViewModel
     private void CheckMinBlobVolume()
     {
         //Проверка, что объем не стал меньше 0. Вызывается везде, где уменьшается объем
-        if(blobVolume.Value <= 0)
+        if(blobVolume.Value <= GlobalModel.Instance.MinBlobVolume)
         {
             //blobVolume.Value = GlobalModel.Instance.StartBlobVolume;//Конец игры
             if(volumeDecreaseFromHighTemp != null)
@@ -87,7 +87,7 @@ public class BlobVolumeViewModel
     private void CheckMaxBlobVolume()
     {
         //Проверка, что объем не стал больше 100. Вызывается везде, где увеличивается температура
-        if (blobVolume.Value >= 100)
+        if (blobVolume.Value >= GlobalModel.Instance.MaxBlobVolume)
         {
             blobVolume.Value = 100;
         }

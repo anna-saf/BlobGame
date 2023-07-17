@@ -38,10 +38,16 @@ public class GlobalModel : MonoBehaviour
 
     [Header("----------------------")]
 
-    //
+    
     [Header("Стартовый объем капли")]
     [SerializeField] private float startBlobVolume;
-    //
+
+    [Header("Максимальный объем капли")]
+    [SerializeField] private float maxBlobVolume;
+
+    [Header("Минимальный объем капли")]
+    [SerializeField] private float minBlobVolume;
+
     [Header("Стартовый размер капли")]
     [SerializeField] private float startBlobSize;
 
@@ -100,7 +106,11 @@ public class GlobalModel : MonoBehaviour
     public float VaporizationVolumeSpeed { get { return vaporizationVolumeSpeed; } }
 
     public float StartBlobVolume { get { return startBlobVolume; } }
+    public float MaxBlobVolume { get { return maxBlobVolume; } }
+    public float MinBlobVolume { get { return minBlobVolume; } }
     public float StartBlobSize{ get { return startBlobSize; } }
+
+
     public float StartJumpHeight { get { return startJumpHeight; } }
     public float StartBlobSpeed { get { return startBlobSpeed; } }
     public float MaxBlobSpeed { get { return maxBlobSpeed; } }
