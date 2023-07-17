@@ -7,6 +7,7 @@ using UnityEngine;
 public class BlobVolumeViewModel
 {
     public ReactiveProperty<float> blobVolume { get; private set; } = new ReactiveProperty<float>();
+    private float blobVolumeValue;
 
     public ReactiveProperty<float> blobSize { get; private set; } = new ReactiveProperty<float>();
 
@@ -14,44 +15,41 @@ public class BlobVolumeViewModel
 
     private CoroutineRunner coroutineRunner;
 
-    private bool isGameEnd = false;
-
     public BlobVolumeViewModel(ReactiveProperty<float> blobTemp)
     {
         coroutineRunner = CoroutineRunner.Instance;
         blobSize.Value = GlobalModel.Instance.StartBlobSize;
         blobVolume.Value = GlobalModel.Instance.StartBlobVolume;
-        blobVolume.Subscribe(_ => OnBlobVolumeChange(_));
+        blobVolumeValue = blobVolume.Value;
         CheckpointManager.Instance.OnGoToLastCheckpoint += CheckpointManager_OnGoToLastCheckpoint;
         blobTemp.Subscribe(_ => CheckVaporizeTemp(_));
     }
 
-
-    public void Update()
-    {
-        if (isGameEnd)
-        {
-            isGameEnd = false;
-            GameManager.Instance.TryGameOver();
-        }
-    }
-    private void OnBlobVolumeChange(float volume)
+    private void OnBlobVolumeChange()
     {
         //Функция, которая вызывается каждый раз, когда меняется температура
         CheckMinBlobVolume();
         CheckMaxBlobVolume();
-        CheckSizeChangeFromVolume(volume);
+        ChangeBlobVolumeReactiveProperty(blobVolumeValue);
+        CheckSizeChangeFromVolume(blobVolumeValue);
     }
 
     private void CheckpointManager_OnGoToLastCheckpoint(object sender, System.EventArgs e)
     {
-        blobVolume.Value = CheckpointManager.Instance.BlobVolumeCheckpoint;
+        blobVolumeValue = CheckpointManager.Instance.BlobVolumeCheckpoint; 
+        if (volumeDecreaseFromHighTemp != null)
+        {
+            coroutineRunner.StopOneCoroutine(volumeDecreaseFromHighTemp);
+            volumeDecreaseFromHighTemp = null;
+        }
+        OnBlobVolumeChange();
     }
 
     public void WaterTouchActions()
     {
         //Функция вызывается при касании с водой
-        blobVolume.Value += GlobalModel.Instance.BlobVolumeFilled;
+        blobVolumeValue += GlobalModel.Instance.BlobVolumeFilled;
+        OnBlobVolumeChange();
     }
 
     private void CheckVaporizeTemp(float blobTemp)
@@ -72,24 +70,23 @@ public class BlobVolumeViewModel
     private void CheckMinBlobVolume()
     {
         //Проверка, что объем не стал меньше 0. Вызывается везде, где уменьшается объем
-        if(blobVolume.Value <= GlobalModel.Instance.MinBlobVolume)
+        if(blobVolumeValue <= GlobalModel.Instance.MinBlobVolume)
         {
-            //blobVolume.Value = GlobalModel.Instance.StartBlobVolume;//Конец игры
             if(volumeDecreaseFromHighTemp != null)
             {
                 coroutineRunner.StopOneCoroutine(volumeDecreaseFromHighTemp);
                 volumeDecreaseFromHighTemp = null;
             }
-            isGameEnd = true;
+            GameManager.Instance.TryGameOver();
         }
     }
 
     private void CheckMaxBlobVolume()
     {
         //Проверка, что объем не стал больше 100. Вызывается везде, где увеличивается температура
-        if (blobVolume.Value >= GlobalModel.Instance.MaxBlobVolume)
+        if (blobVolumeValue > GlobalModel.Instance.MaxBlobVolume)
         {
-            blobVolume.Value = 100;
+            blobVolumeValue = GlobalModel.Instance.MaxBlobVolume;
         }
     }
 
@@ -115,8 +112,14 @@ public class BlobVolumeViewModel
         //Корутина для уменьшения объема капли
         while (true)
         {
-            blobVolume.Value -= GlobalModel.Instance.VaporizationVolumeSpeed;
+            blobVolumeValue -= GlobalModel.Instance.VaporizationVolumeSpeed;
+            OnBlobVolumeChange();
             yield return new WaitForSeconds(GlobalModel.Instance.ModificationTime);
         }
+    }
+
+    private void ChangeBlobVolumeReactiveProperty(float blobVolumeVal)
+    {
+        blobVolume.Value = blobVolumeVal;
     }
 }
